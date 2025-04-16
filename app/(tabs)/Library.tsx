@@ -56,7 +56,6 @@ export default function LibraryScreen() {
 
   const renderTrack = (song: any) => (
     <TouchableOpacity
-      style={styles.item}
       onPress={() =>
         play({
           id: song.id,
@@ -66,6 +65,10 @@ export default function LibraryScreen() {
           url: song.audio_url,
         })
       }
+      style={({ pressed }) => [
+        styles.item,
+        { opacity: pressed ? 0.7 : 1 },
+      ]}
     >
       <Image source={{ uri: song.artwork }} style={styles.artwork} />
       <View>
@@ -80,7 +83,10 @@ export default function LibraryScreen() {
       <Text style={styles.title}>Your Favorites</Text>
 
       {favorites.length === 0 ? (
-        <Text style={styles.empty}>No favorites yet.</Text>
+        <View style={{ alignItems: 'center', marginTop: 40 }}>
+          <Text style={styles.empty}>No favorites yet.</Text>
+          <Text style={styles.tip}>Tap the heart icon to save your favorite songs.</Text>
+        </View>
       ) : (
         favorites.map((entry) => renderTrack(entry.songs))
       )}
@@ -88,7 +94,10 @@ export default function LibraryScreen() {
       <Text style={[styles.title, { marginTop: 32 }]}>Recently Played</Text>
 
       {recent.length === 0 ? (
-        <Text style={styles.empty}>You haven’t played anything yet.</Text>
+        <View style={{ alignItems: 'center', marginTop: 40 }}>
+          <Text style={styles.empty}>You haven’t played anything yet.</Text>
+          <Text style={styles.tip}>Tap a song to start building your history.</Text>
+        </View>
       ) : (
         recent.map((entry) => renderTrack(entry.songs))
       )}
@@ -113,7 +122,12 @@ const styles = StyleSheet.create({
     color: '#777',
     fontSize: 14,
     textAlign: 'center',
-    marginBottom: 16,
+  },
+  tip: {
+    color: '#444',
+    fontSize: 12,
+    marginTop: 6,
+    textAlign: 'center',
   },
   item: {
     flexDirection: 'row',
