@@ -1,14 +1,35 @@
-import { View, Text, StyleSheet } from 'react-native';
-import SignOutButton from '../../components/SignOutButton';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { useAuth } from '../../context/AuthProvider';
+import { supabase } from '../../supabase/supabase';
+import { usePlayerStore } from '../../store/usePlayerStore';
 
 export default function ProfileScreen() {
+  const { session } = useAuth();
+  const user = session?.user;
+  const setSession = usePlayerStore((state) => state.setSession);
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      Alert.alert('Error', error.message);
+    } else {
+      setSession(null);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Your Profile</Text>
-      <Text style={styles.subtitle}>Manage account settings and preferences.</Text>
+      <Text style={styles.heading}>Your Profile</Text>
 
-      {/* Sign out button */}
-      <SignOutButton />
+      <Text style={styles.label}>Email:</Text>
+      <Text style={styles.value}>{user?.email || 'Unknown'}</Text>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleLogout}
+      >
+        <Text style={styles.buttonText}>Sign Out</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -20,15 +41,33 @@ const styles = StyleSheet.create({
     padding: 24,
     paddingTop: 100,
   },
-  title: {
+  heading: {
     fontSize: 28,
-    fontWeight: '700',
-    color: '#ffffff',
+    fontWeight: '800',
+    color: '#fff',
+    marginBottom: 30,
   },
-  subtitle: {
+  label: {
+    color: '#aaa',
     fontSize: 16,
-    color: '#bbbbbb',
-    marginTop: 8,
+    marginBottom: 4,
+  },
+  value: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
     marginBottom: 32,
+  },
+  button: {
+    backgroundColor: '#00ffcc',
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#000',
+    fontSize: 16,
+    fontWeight: '700',
   },
 });
