@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../supabase/supabase';
 import { Session } from '@supabase/supabase-js';
+import { usePlayerStore } from '../store/usePlayerStore';
 
 type AuthContextType = {
   session: Session | null;
@@ -15,6 +16,7 @@ const AuthContext = createContext<AuthContextType>({
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const setPlayerSession = usePlayerStore((state) => state.setSession);
 
   useEffect(() => {
     const getSession = async () => {
@@ -22,11 +24,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         data: { session },
       } = await supabase.auth.getSession();
       setSession(session ?? null);
+      setPlayerSession(session ?? null);
       setLoading(false);
     };
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session ?? null);
+      setPlayerSession(session ?? null);
     });
 
     getSession();
