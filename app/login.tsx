@@ -25,7 +25,7 @@ export default function LoginScreen() {
     if (error) {
       Alert.alert('Login Failed', error.message);
     } else {
-      router.replace('/');
+      router.replace('/(tabs)/home');
     }
   };
 
