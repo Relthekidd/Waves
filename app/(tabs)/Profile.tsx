@@ -100,6 +100,31 @@ export default function ProfileScreen() {
       >
         <Text style={styles.buttonText}>Sign Out</Text>
       </TouchableOpacity>
+
+      {/* Settings section */}
+      <View style={styles.settingsSection}>
+        <Text style={styles.label}>App Settings</Text>
+
+        <TouchableOpacity
+          style={styles.settingRow}
+          onPress={() =>
+            Alert.alert('Coming Soon', 'Dark mode toggle will be available soon.')
+          }
+        >
+          <Text style={styles.settingText}>Dark Mode</Text>
+          <Text style={styles.settingToggle}>Auto</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.settingRow}
+          onPress={() =>
+            Alert.alert('Coming Soon', 'Profile editing is under development.')
+          }
+        >
+          <Text style={styles.settingText}>Edit Profile</Text>
+          <Text style={styles.settingToggle}>--</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -161,5 +186,25 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 16,
     fontWeight: '700',
+  },
+  settingsSection: {
+    marginTop: 48,
+    borderTopWidth: 1,
+    borderTopColor: '#222',
+    paddingTop: 24,
+  },
+  settingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+  },
+  settingText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  settingToggle: {
+    color: '#00ffcc',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
