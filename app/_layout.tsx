@@ -1,23 +1,35 @@
 import { useAuth } from '../context/AuthProvider';
 import { Redirect, Slot } from 'expo-router';
 import { View, ActivityIndicator } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { enableScreens } from 'react-native-screens';
+
+enableScreens();
 
 export default function AppLayout() {
   const { session, loading } = useAuth();
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0f0f0f' }}>
-        <ActivityIndicator size="large" color="#00ffcc" />
-      </View>
+      <SafeAreaProvider>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0f0f0f' }}>
+          <ActivityIndicator size="large" color="#00ffcc" />
+        </View>
+      </SafeAreaProvider>
     );
   }
 
-  // Redirect signed-in users to tab layout
   if (session) {
-    return <Redirect href="/(tabs)/home" />;
+    return (
+      <SafeAreaProvider>
+        <Redirect href="/(tabs)/home" />
+      </SafeAreaProvider>
+    );
   }
 
-  // Let unauthenticated users access login, signup, etc.
-  return <Slot />;
+  return (
+    <SafeAreaProvider>
+      <Slot />
+    </SafeAreaProvider>
+  );
 }
