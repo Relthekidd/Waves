@@ -1,12 +1,55 @@
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import { useAuth } from '../../context/AuthProvider';
 import { supabase } from '../../supabase/supabase';
 import { usePlayerStore } from '../../store/usePlayerStore';
+import { useRouter } from 'expo-router';
 
 export default function ProfileScreen() {
   const { session } = useAuth();
   const user = session?.user;
   const setSession = usePlayerStore((state) => state.setSession);
+  const [favorites, setFavorites] = useState<any[]>([]);
+  const [history, setHistory] = useState<any[]>([]);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchData = async () => {
+      const { data: favs } = await supabase
+        .from('favorites')
+        .select('*, songs(*)')
+        .eq('user_id', user.id)
+        .limit(3);
+
+      const { data: hist } = await supabase
+        .from('listening_history')
+        .select('*, songs(*)')
+        .eq('user_id', user.id)
+        .order('played_at', { ascending: false })
+        .limit(6);
+
+      if (favs) setFavorites(favs);
+      if (hist) {
+        const seen = new Set();
+        const unique = hist.filter((entry) => {
+          if (seen.has(entry.song_id)) return false;
+          seen.add(entry.song_id);
+          return true;
+        });
+        setHistory(unique.slice(0, 3));
+      }
+    };
+
+    fetchData();
+  }, [user?.id]);
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -17,6 +60,30 @@ export default function ProfileScreen() {
     }
   };
 
+  const renderMiniList = (items: any[], label: string, navigateTo: string) => (
+    <View style={{ marginTop: 32 }}>
+      <View style={styles.rowHeader}>
+        <Text style={styles.label}>{label}</Text>
+        <TouchableOpacity onPress={() => router.push(navigateTo)}>
+          <Text style={styles.link}>View All</Text>
+        </TouchableOpacity>
+      </View>
+      {items.length === 0 ? (
+        <Text style={styles.empty}>No {label.toLowerCase()} yet.</Text>
+      ) : (
+        items.map((entry) => {
+          const song = entry.songs;
+          return (
+            <View key={song.id} style={styles.songRow}>
+              <Text style={styles.value}>{song.title}</Text>
+              <Text style={styles.songArtist}>{song.artist}</Text>
+            </View>
+          );
+        })
+      )}
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Your Profile</Text>
@@ -24,8 +91,11 @@ export default function ProfileScreen() {
       <Text style={styles.label}>Email:</Text>
       <Text style={styles.value}>{user?.email || 'Unknown'}</Text>
 
+      {renderMiniList(favorites, 'Favorites', '/library')}
+      {renderMiniList(history, 'Recently Played', '/library')}
+
       <TouchableOpacity
-        style={styles.button}
+        style={[styles.button, { marginTop: 48 }]}
         onPress={handleLogout}
       >
         <Text style={styles.buttonText}>Sign Out</Text>
@@ -56,7 +126,29 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: '600',
-    marginBottom: 32,
+    marginBottom: 12,
+  },
+  rowHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  link: {
+    color: '#00ffcc',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  songRow: {
+    marginBottom: 12,
+  },
+  songArtist: {
+    color: '#888',
+    fontSize: 13,
+  },
+  empty: {
+    color: '#555',
+    fontSize: 14,
+    marginTop: 4,
   },
   button: {
     backgroundColor: '#00ffcc',
