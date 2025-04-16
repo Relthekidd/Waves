@@ -13,29 +13,69 @@ import { usePlayerStore } from '../../store/usePlayerStore';
 
 export default function ExploreScreen() {
   const [songs, setSongs] = useState<any[]>([]);
+  const [selectedTag, setSelectedTag] = useState<string>('All');
   const { play } = usePlayerStore();
+
+  const tags = ['All', 'Turn Up', 'Chill', 'Hip-Hop', 'R&B'];
 
   useEffect(() => {
     const fetchSongs = async () => {
-      const { data, error } = await supabase
-        .from('songs')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const { data, error } = await supabase.from('songs').select('*');
       if (!error && data) setSongs(data);
     };
 
     fetchSongs();
   }, []);
 
-  const renderRow = (title: string, filterFn: (song: any) => boolean) => {
-    const filtered = songs.filter(filterFn);
-    if (filtered.length === 0) return null;
+  const getFilteredSongs = () => {
+    if (selectedTag === 'All') return songs;
 
-    return (
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{title}</Text>
+    return songs.filter(
+      (s) =>
+        s.genre?.toLowerCase() === selectedTag.toLowerCase() ||
+        s.mood?.toLowerCase() === selectedTag.toLowerCase()
+    );
+  };
+
+  const filteredSongs = getFilteredSongs();
+
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 120 }}>
+      <Text style={styles.title}>Explore</Text>
+
+      {/* Grid-style tags */}
+      <View style={styles.tagGrid}>
+        {tags.map((tag) => (
+          <TouchableOpacity
+            key={tag}
+            style={[
+              styles.tag,
+              selectedTag === tag && styles.activeTag,
+            ]}
+            onPress={() => setSelectedTag(tag)}
+          >
+            <Text
+              style={[
+                styles.tagText,
+                selectedTag === tag && styles.activeTagText,
+              ]}
+            >
+              {tag}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* Dynamic Results */}
+      <Text style={styles.sectionTitle}>
+        {selectedTag === 'All' ? 'All Songs' : selectedTag}
+      </Text>
+
+      {filteredSongs.length === 0 ? (
+        <Text style={styles.empty}>No songs found for this filter.</Text>
+      ) : (
         <FlatList
-          data={filtered}
+          data={filteredSongs}
           horizontal
           showsHorizontalScrollIndicator={false}
           keyExtractor={(item) => item.id}
@@ -62,19 +102,7 @@ export default function ExploreScreen() {
             </TouchableOpacity>
           )}
         />
-      </View>
-    );
-  };
-
-  return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 120 }}>
-      <Text style={styles.title}>Explore</Text>
-
-      {renderRow('New Releases', () => true)}
-      {renderRow('Turn Up Vibes', (s) => s.mood?.toLowerCase() === 'turn up')}
-      {renderRow('Chill & Smooth', (s) => s.mood?.toLowerCase() === 'chill')}
-      {renderRow('Hip-Hop Hits', (s) => s.genre?.toLowerCase() === 'hip-hop')}
-      {renderRow('R&B Feels', (s) => s.genre?.toLowerCase() === 'r&b')}
+      )}
     </ScrollView>
   );
 }
@@ -92,14 +120,35 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginBottom: 16,
   },
-  section: {
-    marginBottom: 32,
-  },
   sectionTitle: {
     color: '#ffffff',
     fontSize: 20,
     fontWeight: '700',
     marginBottom: 12,
+    marginTop: 32,
+  },
+  tagGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 12,
+  },
+  tag: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 20,
+  },
+  activeTag: {
+    backgroundColor: '#00ffcc',
+  },
+  tagText: {
+    color: '#aaa',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  activeTagText: {
+    color: '#000',
   },
   card: {
     marginRight: 16,
@@ -119,5 +168,11 @@ const styles = StyleSheet.create({
   cardArtist: {
     color: '#bbb',
     fontSize: 12,
+  },
+  empty: {
+    color: '#777',
+    fontSize: 14,
+    marginTop: 16,
+    textAlign: 'center',
   },
 });
