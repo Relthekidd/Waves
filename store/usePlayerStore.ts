@@ -15,7 +15,11 @@ type PlayerState = {
   currentTime: number;
   duration: number;
   progress: number;
-  play: (track: Track) => Promise<void>;
+  queue: Track[];
+  currentIndex: number;
+  play: (track: Track, queue?: Track[]) => Promise<void>;
+  playNext: () => Promise<void>;
+  playPrevious: () => Promise<void>;
   togglePlay: () => void;
   stop: () => void;
 };
@@ -28,8 +32,10 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   currentTime: 0,
   duration: 0,
   progress: 0,
+  queue: [],
+  currentIndex: 0,
 
-  play: async (track) => {
+  play: async (track, queue = []) => {
     if (sound) {
       await sound.unloadAsync();
       sound = null;
@@ -37,7 +43,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
     const { sound: newSound } = await Audio.Sound.createAsync(
       { uri: track.url },
-      { shouldPlay: true },
+      { shouldPlay: true }
     );
 
     sound = newSound;
@@ -48,6 +54,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
       currentTime: 0,
       duration: 0,
       progress: 0,
+      queue: queue.length ? queue : [track],
+      currentIndex: 0,
     });
 
     newSound.setOnPlaybackStatusUpdate((status) => {
@@ -61,8 +69,30 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
         progress: s.durationMillis ? s.positionMillis / s.durationMillis : 0,
       });
 
-      if (s.didJustFinish) get().stop();
+      if (s.didJustFinish) get().playNext();
     });
+  },
+
+  playNext: async () => {
+    const { queue, currentIndex } = get();
+    const nextIndex = currentIndex + 1;
+    if (nextIndex < queue.length) {
+      const nextTrack = queue[nextIndex];
+      await get().play(nextTrack, queue);
+      set({ currentIndex: nextIndex });
+    } else {
+      get().stop(); // reached end of queue
+    }
+  },
+
+  playPrevious: async () => {
+    const { queue, currentIndex } = get();
+    const prevIndex = currentIndex - 1;
+    if (prevIndex >= 0) {
+      const prevTrack = queue[prevIndex];
+      await get().play(prevTrack, queue);
+      set({ currentIndex: prevIndex });
+    }
   },
 
   togglePlay: async () => {
@@ -92,6 +122,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
       currentTime: 0,
       duration: 0,
       progress: 0,
+      queue: [],
+      currentIndex: 0,
     });
   },
 }));
