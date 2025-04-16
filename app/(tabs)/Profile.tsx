@@ -64,12 +64,22 @@ export default function ProfileScreen() {
     <View style={{ marginTop: 32 }}>
       <View style={styles.rowHeader}>
         <Text style={styles.label}>{label}</Text>
-        <TouchableOpacity onPress={() => router.push(navigateTo)}>
+        <TouchableOpacity
+          onPress={() => router.push(navigateTo)}
+          style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
+        >
           <Text style={styles.link}>View All</Text>
         </TouchableOpacity>
       </View>
       {items.length === 0 ? (
-        <Text style={styles.empty}>No {label.toLowerCase()} yet.</Text>
+        <View style={{ alignItems: 'center', marginTop: 8 }}>
+          <Text style={styles.empty}>No {label.toLowerCase()} yet.</Text>
+          <Text style={styles.tip}>
+            {label === 'Favorites'
+              ? 'Heart a song to add it here.'
+              : 'Songs you play will show up here.'}
+          </Text>
+        </View>
       ) : (
         items.map((entry) => {
           const song = entry.songs;
@@ -106,7 +116,10 @@ export default function ProfileScreen() {
         <Text style={styles.label}>App Settings</Text>
 
         <TouchableOpacity
-          style={styles.settingRow}
+          style={({ pressed }) => [
+            styles.settingRow,
+            { opacity: pressed ? 0.7 : 1 },
+          ]}
           onPress={() =>
             Alert.alert('Coming Soon', 'Dark mode toggle will be available soon.')
           }
@@ -116,7 +129,10 @@ export default function ProfileScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.settingRow}
+          style={({ pressed }) => [
+            styles.settingRow,
+            { opacity: pressed ? 0.7 : 1 },
+          ]}
           onPress={() =>
             Alert.alert('Coming Soon', 'Profile editing is under development.')
           }
@@ -173,7 +189,13 @@ const styles = StyleSheet.create({
   empty: {
     color: '#555',
     fontSize: 14,
-    marginTop: 4,
+    textAlign: 'center',
+  },
+  tip: {
+    color: '#444',
+    fontSize: 12,
+    marginTop: 6,
+    textAlign: 'center',
   },
   button: {
     backgroundColor: '#00ffcc',
