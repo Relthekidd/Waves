@@ -10,7 +10,16 @@ const formatTime = (ms: number) => {
 };
 
 export default function PlayerScreen() {
-  const { currentTrack, isPlaying, togglePlay, currentTime, duration, progress } = usePlayerStore();
+  const {
+    currentTrack,
+    isPlaying,
+    togglePlay,
+    currentTime,
+    duration,
+    progress,
+    playNext,
+    playPrevious,
+  } = usePlayerStore();
 
   if (!currentTrack) {
     return (
@@ -40,13 +49,19 @@ export default function PlayerScreen() {
         </View>
       </View>
 
-      <TouchableOpacity onPress={togglePlay} style={styles.playButton}>
-        <Ionicons
-          name={isPlaying ? 'pause' : 'play'}
-          size={48}
-          color="#00ffcc"
-        />
-      </TouchableOpacity>
+      <View style={styles.controls}>
+        <TouchableOpacity onPress={playPrevious}>
+          <Ionicons name="play-skip-back" size={40} color="#00ffcc" />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={togglePlay} style={styles.playPause}>
+          <Ionicons name={isPlaying ? 'pause' : 'play'} size={48} color="#00ffcc" />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={playNext}>
+          <Ionicons name="play-skip-forward" size={40} color="#00ffcc" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -104,8 +119,14 @@ const styles = StyleSheet.create({
     color: '#aaa',
     fontSize: 12,
   },
-  playButton: {
-    padding: 20,
+  controls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
+    gap: 28,
+  },
+  playPause: {
+    paddingHorizontal: 16,
   },
   emptyContainer: {
     flex: 1,
