@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { Audio, AVPlaybackStatusSuccess } from 'expo-av';
+import { supabase } from '../supabase/supabase';
+import { Session } from '@supabase/supabase-js';
 
 type Track = {
   id: string;
@@ -17,6 +19,8 @@ type PlayerState = {
   progress: number;
   queue: Track[];
   currentIndex: number;
+  session: Session | null;
+  setSession: (session: Session | null) => void;
   play: (track: Track, queue?: Track[]) => Promise<void>;
   playNext: () => Promise<void>;
   playPrevious: () => Promise<void>;
@@ -34,6 +38,9 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   progress: 0,
   queue: [],
   currentIndex: 0,
+  session: null,
+
+  setSession: (session) => set({ session }),
 
   play: async (track, queue = []) => {
     if (sound) {
@@ -57,6 +64,15 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
       queue: queue.length ? queue : [track],
       currentIndex: 0,
     });
+
+    // Track listening history
+    const userId = get().session?.user.id;
+    if (userId) {
+      await supabase.from('listening_history').insert({
+        user_id: userId,
+        song_id: track.id,
+      });
+    }
 
     newSound.setOnPlaybackStatusUpdate((status) => {
       if (!status.isLoaded) return;
