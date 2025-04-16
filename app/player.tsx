@@ -1,6 +1,20 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
+import { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import { usePlayerStore } from '../store/usePlayerStore';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../context/AuthProvider';
+import {
+  addFavorite,
+  removeFavorite,
+  isFavorited,
+} from '../utils/favorites';
 
 const formatTime = (ms: number) => {
   const totalSeconds = Math.floor(ms / 1000);
@@ -21,6 +35,18 @@ export default function PlayerScreen() {
     playPrevious,
   } = usePlayerStore();
 
+  const { session } = useAuth();
+  const userId = session?.user.id;
+  const [favorited, setFavorited] = useState(false);
+
+  useEffect(() => {
+    if (currentTrack && userId) {
+      isFavorited(userId, currentTrack.id).then((res) => {
+        if (!res.error) setFavorited(res.isFavorite);
+      });
+    }
+  }, [currentTrack]);
+
   if (!currentTrack) {
     return (
       <View style={styles.emptyContainer}>
@@ -32,6 +58,28 @@ export default function PlayerScreen() {
   return (
     <View style={styles.container}>
       <Image source={{ uri: currentTrack.artwork }} style={styles.artwork} />
+
+      {/* Favorite Button */}
+      <TouchableOpacity
+        onPress={async () => {
+          if (!currentTrack || !userId) return;
+
+          if (favorited) {
+            const error = await removeFavorite(userId, currentTrack.id);
+            if (!error) setFavorited(false);
+          } else {
+            const error = await addFavorite(userId, currentTrack.id);
+            if (!error) setFavorited(true);
+          }
+        }}
+        style={styles.heart}
+      >
+        <Ionicons
+          name={favorited ? 'heart' : 'heart-outline'}
+          size={32}
+          color={favorited ? '#ff3d6f' : '#888'}
+        />
+      </TouchableOpacity>
 
       <View style={styles.trackInfo}>
         <Text style={styles.title} numberOfLines={1}>{currentTrack.title}</Text>
@@ -127,6 +175,11 @@ const styles = StyleSheet.create({
   },
   playPause: {
     paddingHorizontal: 16,
+  },
+  heart: {
+    position: 'absolute',
+    top: 60,
+    right: 30,
   },
   emptyContainer: {
     flex: 1,
