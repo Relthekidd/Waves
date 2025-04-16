@@ -2,7 +2,7 @@ import { useAuth } from '../context/AuthProvider';
 import { Redirect, Slot } from 'expo-router';
 import { View, ActivityIndicator } from 'react-native';
 
-export default function ProtectedLayout() {
+export default function AppLayout() {
   const { session, loading } = useAuth();
 
   if (loading) {
@@ -13,9 +13,11 @@ export default function ProtectedLayout() {
     );
   }
 
-  if (!session) {
-    return <Redirect href="/login" />;
+  // Redirect signed-in users to tab layout
+  if (session) {
+    return <Redirect href="/(tabs)/home" />;
   }
 
+  // Let unauthenticated users access login, signup, etc.
   return <Slot />;
 }
