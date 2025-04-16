@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
+  Image,
 } from 'react-native';
 import { supabase } from '../../supabase/supabase';
 import { useAuth } from '../../context/AuthProvider';
@@ -20,6 +21,7 @@ export default function UploadScreen() {
   const [audioUrl, setAudioUrl] = useState('');
   const [artworkUrl, setArtworkUrl] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   const handleUpload = async () => {
     if (!title || !artist || !audioUrl || !artworkUrl) {
@@ -52,6 +54,7 @@ export default function UploadScreen() {
       setMood('');
       setAudioUrl('');
       setArtworkUrl('');
+      setShowPreview(false);
     }
   };
 
@@ -107,9 +110,39 @@ export default function UploadScreen() {
         placeholderTextColor="#666"
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleUpload} disabled={uploading}>
-        <Text style={styles.buttonText}>{uploading ? 'Uploading...' : 'Upload'}</Text>
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: '#444' }]}
+        onPress={() => setShowPreview(true)}
+      >
+        <Text style={[styles.buttonText, { color: '#fff' }]}>Preview</Text>
       </TouchableOpacity>
+
+      {showPreview && (
+        <View style={styles.previewBox}>
+          <Text style={styles.previewTitle}>Preview</Text>
+          <Text style={styles.previewText}>Title: {title}</Text>
+          <Text style={styles.previewText}>Artist: {artist}</Text>
+          <Text style={styles.previewText}>Genre: {genre || '-'}</Text>
+          <Text style={styles.previewText}>Mood: {mood || '-'}</Text>
+          <Text style={styles.previewText}>Audio URL: {audioUrl || '-'}</Text>
+          <Text style={styles.previewText}>Artwork:</Text>
+
+          {artworkUrl ? (
+            <Image source={{ uri: artworkUrl }} style={styles.previewImage} />
+          ) : (
+            <Text style={styles.previewText}>None</Text>
+          )}
+
+          <TouchableOpacity
+            style={[styles.button, { marginTop: 20 }]}
+            onPress={handleUpload}
+          >
+            <Text style={styles.buttonText}>
+              {uploading ? 'Uploading...' : 'Confirm Upload'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -147,5 +180,28 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 16,
     fontWeight: '700',
+  },
+  previewBox: {
+    backgroundColor: '#1a1a1a',
+    padding: 16,
+    borderRadius: 16,
+    marginTop: 24,
+  },
+  previewTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#fff',
+    marginBottom: 12,
+  },
+  previewText: {
+    color: '#ccc',
+    fontSize: 14,
+    marginBottom: 6,
+  },
+  previewImage: {
+    width: '100%',
+    height: 180,
+    borderRadius: 12,
+    marginTop: 8,
   },
 });
