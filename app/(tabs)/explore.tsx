@@ -39,9 +39,54 @@ export default function ExploreScreen() {
 
   const filteredSongs = getFilteredSongs();
 
+  const renderRow = (title: string, filterFn: (s: any) => boolean) => {
+    const filtered = songs.filter(filterFn);
+    if (filtered.length === 0) return null;
+
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        <FlatList
+          data={filtered}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() =>
+                play({
+                  id: item.id,
+                  title: item.title,
+                  artist: item.artist,
+                  artwork: item.artwork,
+                  url: item.audio_url,
+                })
+              }
+            >
+              <Image source={{ uri: item.artwork }} style={styles.artwork} />
+              <Text style={styles.cardTitle} numberOfLines={1}>
+                {item.title}
+              </Text>
+              <Text style={styles.cardArtist} numberOfLines={1}>
+                {item.artist}
+              </Text>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+    );
+  };
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 120 }}>
       <Text style={styles.title}>Explore</Text>
+
+      {/* Trending Row */}
+      {renderRow('Trending Now', (s) =>
+        s.title.toLowerCase().includes('like') ||
+        s.mood?.toLowerCase() === 'turn up'
+      )}
 
       {/* Grid-style tags */}
       <View style={styles.tagGrid}>
@@ -149,6 +194,9 @@ const styles = StyleSheet.create({
   },
   activeTagText: {
     color: '#000',
+  },
+  section: {
+    marginTop: 12,
   },
   card: {
     marginRight: 16,
