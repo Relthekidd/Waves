@@ -53,7 +53,6 @@ export default function ExploreScreen() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={styles.card}
               onPress={() =>
                 play({
                   id: item.id,
@@ -63,6 +62,10 @@ export default function ExploreScreen() {
                   url: item.audio_url,
                 })
               }
+              style={({ pressed }) => [
+                styles.card,
+                { opacity: pressed ? 0.7 : 1 },
+              ]}
             >
               <Image source={{ uri: item.artwork }} style={styles.artwork} />
               <Text style={styles.cardTitle} numberOfLines={1}>
@@ -117,7 +120,10 @@ export default function ExploreScreen() {
       </Text>
 
       {filteredSongs.length === 0 ? (
-        <Text style={styles.empty}>No songs found for this filter.</Text>
+        <View style={{ alignItems: 'center', marginTop: 40 }}>
+          <Text style={styles.empty}>No songs found for this filter.</Text>
+          <Text style={styles.tip}>Try picking a different vibe.</Text>
+        </View>
       ) : (
         <FlatList
           data={filteredSongs}
@@ -126,7 +132,6 @@ export default function ExploreScreen() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={styles.card}
               onPress={() =>
                 play({
                   id: item.id,
@@ -136,6 +141,10 @@ export default function ExploreScreen() {
                   url: item.audio_url,
                 })
               }
+              style={({ pressed }) => [
+                styles.card,
+                { opacity: pressed ? 0.7 : 1 },
+              ]}
             >
               <Image source={{ uri: item.artwork }} style={styles.artwork} />
               <Text style={styles.cardTitle} numberOfLines={1}>
@@ -222,5 +231,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 16,
     textAlign: 'center',
+  },
+  tip: {
+    color: '#444',
+    fontSize: 12,
+    marginTop: 6,
   },
 });
