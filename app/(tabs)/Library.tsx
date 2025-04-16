@@ -1,19 +1,38 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
 import { supabase } from '../../supabase/supabase';
 import { usePlayerStore } from '../../store/usePlayerStore';
 import { useAuth } from '../../context/AuthProvider';
 
 export default function LibraryScreen() {
+  const [favorites, setFavorites] = useState<any[]>([]);
   const [recent, setRecent] = useState<any[]>([]);
   const { play } = usePlayerStore();
   const { session } = useAuth();
   const userId = session?.user.id;
 
   useEffect(() => {
-    const fetchRecent = async () => {
-      if (!userId) return;
+    if (!userId) return;
 
+    const fetchFavorites = async () => {
+      const { data, error } = await supabase
+        .from('favorites')
+        .select('*, songs(*)')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (!error && data) setFavorites(data);
+    };
+
+    const fetchRecent = async () => {
       const { data, error } = await supabase
         .from('listening_history')
         .select('*, songs(*)')
@@ -21,7 +40,6 @@ export default function LibraryScreen() {
         .order('played_at', { ascending: false });
 
       if (!error && data) {
-        // Filter to only show unique songs
         const seen = new Set();
         const unique = data.filter((entry) => {
           if (seen.has(entry.song_id)) return false;
@@ -32,45 +50,49 @@ export default function LibraryScreen() {
       }
     };
 
+    fetchFavorites();
     fetchRecent();
   }, [userId]);
 
+  const renderTrack = (song: any) => (
+    <TouchableOpacity
+      style={styles.item}
+      onPress={() =>
+        play({
+          id: song.id,
+          title: song.title,
+          artist: song.artist,
+          artwork: song.artwork,
+          url: song.audio_url,
+        })
+      }
+    >
+      <Image source={{ uri: song.artwork }} style={styles.artwork} />
+      <View>
+        <Text style={styles.songTitle}>{song.title}</Text>
+        <Text style={styles.songArtist}>{song.artist}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Recently Played</Text>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 100 }}>
+      <Text style={styles.title}>Your Favorites</Text>
+
+      {favorites.length === 0 ? (
+        <Text style={styles.empty}>No favorites yet.</Text>
+      ) : (
+        favorites.map((entry) => renderTrack(entry.songs))
+      )}
+
+      <Text style={[styles.title, { marginTop: 32 }]}>Recently Played</Text>
 
       {recent.length === 0 ? (
         <Text style={styles.empty}>You haven’t played anything yet.</Text>
       ) : (
-        <FlatList
-          data={recent}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => {
-            const song = item.songs;
-            return (
-              <TouchableOpacity
-                style={styles.item}
-                onPress={() =>
-                  play({
-                    id: song.id,
-                    title: song.title,
-                    artist: song.artist,
-                    artwork: song.artwork,
-                    url: song.audio_url,
-                  })
-                }
-              >
-                <Image source={{ uri: song.artwork }} style={styles.artwork} />
-                <View>
-                  <Text style={styles.songTitle}>{song.title}</Text>
-                  <Text style={styles.songArtist}>{song.artist}</Text>
-                </View>
-              </TouchableOpacity>
-            );
-          }}
-        />
+        recent.map((entry) => renderTrack(entry.songs))
       )}
-    </View>
+    </ScrollView>
   );
 }
 
@@ -91,7 +113,7 @@ const styles = StyleSheet.create({
     color: '#777',
     fontSize: 14,
     textAlign: 'center',
-    marginTop: 20,
+    marginBottom: 16,
   },
   item: {
     flexDirection: 'row',
