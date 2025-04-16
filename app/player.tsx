@@ -2,8 +2,15 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'rea
 import { usePlayerStore } from '../store/usePlayerStore';
 import { Ionicons } from '@expo/vector-icons';
 
+const formatTime = (ms: number) => {
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+};
+
 export default function PlayerScreen() {
-  const { currentTrack, isPlaying, togglePlay } = usePlayerStore();
+  const { currentTrack, isPlaying, togglePlay, currentTime, duration, progress } = usePlayerStore();
 
   if (!currentTrack) {
     return (
@@ -22,9 +29,15 @@ export default function PlayerScreen() {
         <Text style={styles.artist} numberOfLines={1}>{currentTrack.artist}</Text>
       </View>
 
-      {/* Static progress bar for now */}
-      <View style={styles.progressBar}>
-        <View style={styles.progressFill} />
+      <View style={styles.progressWrapper}>
+        <View style={styles.progressBar}>
+          <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+        </View>
+
+        <View style={styles.timeRow}>
+          <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
+          <Text style={styles.timeText}>{formatTime(duration)}</Text>
+        </View>
       </View>
 
       <TouchableOpacity onPress={togglePlay} style={styles.playButton}>
@@ -68,18 +81,28 @@ const styles = StyleSheet.create({
     color: '#bbb',
     marginTop: 4,
   },
-  progressBar: {
+  progressWrapper: {
     width: '100%',
+    marginBottom: 24,
+  },
+  progressBar: {
     height: 6,
     backgroundColor: '#333',
     borderRadius: 5,
     overflow: 'hidden',
-    marginVertical: 32,
   },
   progressFill: {
-    width: '40%', // static for now
     height: '100%',
     backgroundColor: '#00ffcc',
+  },
+  timeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 6,
+  },
+  timeText: {
+    color: '#aaa',
+    fontSize: 12,
   },
   playButton: {
     padding: 20,
