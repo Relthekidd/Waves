@@ -1,0 +1,33 @@
+{
+  "name": "premium-event-ticketing",
+  "version": "1.0.0",
+  "description": "A fully responsive ticketing experience for a premium event, incorporating high-fashion visual language and advanced features.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint ."
+  },
+  "keywords": [
+    "event",
+    "ticketing",
+    "premium",
+    "responsive",
+    "nextjs"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "axios": "^0.21.1",
+    "stripe": "^8.0.0"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "eslint": "latest",
+    "eslint-config-next": "latest"
+  }
+}
