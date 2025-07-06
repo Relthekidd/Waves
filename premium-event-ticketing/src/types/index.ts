@@ -3,6 +3,7 @@
 export interface TicketTier {
   id: string;
   name: string;
+  stripe_price_id?: string;
   price: number;
   perks: string[];
   remaining: number;

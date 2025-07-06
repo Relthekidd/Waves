@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 interface TicketTier {
   name: string;
+  stripe_price_id: string;
   price: number;
   perks: string[];
   remaining: number;
