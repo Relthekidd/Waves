@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '../components/Header';
 import Hero from '../components/Hero';
 import Gallery from '../components/Gallery';
@@ -8,18 +8,28 @@ import RSVPForm from '../components/RSVPForm';
 import Footer from '../components/Footer';
 
 const HomePage = () => {
+  const [selectedTier, setSelectedTier] = useState<{ name: string; price: number } | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleSelect = (tier: { name: string; price: number }) => {
+    setSelectedTier(tier);
+    setIsModalOpen(true);
+  };
+
   return (
     <div>
       <Header />
       <Hero />
       <Gallery />
-      <TicketTiers />
-      <CheckoutModal
-        isOpen={false}
-        onClose={() => {}}
-        ticketTier=""
-        price={0}
-      />
+      <TicketTiers onSelect={handleSelect} />
+      {selectedTier && (
+        <CheckoutModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          ticketTier={selectedTier.name}
+          price={selectedTier.price}
+        />
+      )}
       <RSVPForm />
       <Footer />
     </div>

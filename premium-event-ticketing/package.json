@@ -23,7 +23,8 @@
     "react": "latest",
     "react-dom": "latest",
     "axios": "^0.21.1",
-    "stripe": "^8.0.0"
+    "stripe": "^8.0.0",
+    "mongodb": "^5.7.0"
   },
   "devDependencies": {
     "typescript": "latest",

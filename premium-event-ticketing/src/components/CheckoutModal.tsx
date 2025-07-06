@@ -41,7 +41,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, ticketTi
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
+    <div className="modal">
       <div className="modal-content">
         <button className="close" onClick={onClose}>&times;</button>
         <h2>Checkout - {ticketTier} (${price})</h2>
