@@ -8,10 +8,10 @@ import RSVPForm from '../components/RSVPForm';
 import Footer from '../components/Footer';
 
 const HomePage = () => {
-  const [selectedTier, setSelectedTier] = useState<{ name: string; price: number } | null>(null);
+  const [selectedTier, setSelectedTier] = useState<{ name: string; price: number; stripe_price_id: string } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleSelect = (tier: { name: string; price: number }) => {
+  const handleSelect = (tier: { name: string; price: number; stripe_price_id: string }) => {
     setSelectedTier(tier);
     setIsModalOpen(true);
   };
@@ -28,6 +28,7 @@ const HomePage = () => {
           onClose={() => setIsModalOpen(false)}
           ticketTier={selectedTier.name}
           price={selectedTier.price}
+          stripePriceId={selectedTier.stripe_price_id}
         />
       )}
       <RSVPForm />
