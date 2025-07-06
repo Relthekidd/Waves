@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
+import CheckoutButton from './CheckoutButton';
 
 interface CheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
   ticketTier: string;
   price: number;
+  stripePriceId: string;
 }
 
-const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, ticketTier, price }) => {
+const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, ticketTier, price, stripePriceId }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -19,23 +21,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, ticketTi
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Call the checkout API with formData and ticketTier
-    const response = await fetch('/api/checkout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ ...formData, ticketTier, price }),
-    });
-
-    if (response.ok) {
-      alert('Payment processed successfully!');
-      onClose();
-    } else {
-      alert('There was an error processing your payment.');
-    }
   };
 
   if (!isOpen) return null;
@@ -55,7 +42,11 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, ticketTi
           <label htmlFor="phone">Phone</label>
           <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} required />
           
-          <button type="submit" className="btn primary">Pay Now</button>
+          <CheckoutButton
+            ticketData={{ stripe_price_id: stripePriceId, email: formData.email }}
+          >
+            Pay Now
+          </CheckoutButton>
           <p className="note">Secure payment processing placeholder</p>
         </form>
       </div>
