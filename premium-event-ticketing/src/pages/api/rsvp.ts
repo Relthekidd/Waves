@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 // Update the import path to the correct location of connectToDatabase
-import { connectToDatabase } from '../../../utils/db';
+import { connectToDatabase } from '../../utils/db';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {

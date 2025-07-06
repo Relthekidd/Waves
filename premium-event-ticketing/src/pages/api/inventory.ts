@@ -1,9 +1,24 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const inventory = [
-  { tier: 'General Admission', price: 150, remaining: 100 },
-  { tier: 'VIP', price: 300, remaining: 50 },
-  { tier: 'Ultra', price: 600, remaining: 20 },
+  {
+    name: 'General Admission',
+    price: 150,
+    remaining: 100,
+    perks: ['Entry to event', 'Complimentary drink'],
+  },
+  {
+    name: 'VIP',
+    price: 300,
+    remaining: 50,
+    perks: ['All General perks', 'VIP lounge access', 'Expedited entry'],
+  },
+  {
+    name: 'Ultra',
+    price: 600,
+    remaining: 20,
+    perks: ['All VIP perks', 'Table service', 'Meet & Greet'],
+  },
 ];
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {

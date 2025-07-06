@@ -7,7 +7,11 @@ interface TicketTier {
   remaining: number;
 }
 
-const TicketTiers: React.FC = () => {
+interface TicketTiersProps {
+  onSelect: (tier: TicketTier) => void;
+}
+
+const TicketTiers: React.FC<TicketTiersProps> = ({ onSelect }) => {
   const [ticketTiers, setTicketTiers] = useState<TicketTier[]>([]);
 
   useEffect(() => {
@@ -21,8 +25,7 @@ const TicketTiers: React.FC = () => {
   }, []);
 
   const handleSelect = (tier: TicketTier) => {
-    // Logic to handle ticket selection
-    console.log(`Selected ${tier.name} ticket`);
+    onSelect(tier);
   };
 
   return (
