@@ -42,7 +42,8 @@ export default function EventPage({ event }: EventPageProps) {
       </section>
       <TicketTiers
         onSelect={(tier) => {
-          setSelectedTier(tier as TicketTier)
+          // Safe cast with unknown in case TicketTiers doesn't enforce full type
+          setSelectedTier(tier as unknown as TicketTier)
           setOpen(true)
         }}
       />
@@ -71,6 +72,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const doc = await firestore.collection('events').doc(slug).get()
   const event = doc.data() || null
   if (!event) return { notFound: true }
+
   return {
     props: {
       event: { id: doc.id, ...event },

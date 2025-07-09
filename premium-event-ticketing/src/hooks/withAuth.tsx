@@ -2,7 +2,9 @@ import { useAuth } from './useAuth'
 import { useRouter } from 'next/router'
 import React from 'react'
 
-export function withAuth<T>(Component: React.ComponentType<T>) {
+export function withAuth<T extends React.JSX.IntrinsicAttributes>(
+  Component: React.ComponentType<T>
+) {
   return function ProtectedComponent(props: T) {
     const { user, loading } = useAuth()
     const router = useRouter()
@@ -12,6 +14,7 @@ export function withAuth<T>(Component: React.ComponentType<T>) {
       router.push('/')
       return null
     }
+
     return <Component {...props} />
   }
 }

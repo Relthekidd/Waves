@@ -2,7 +2,7 @@
   "name": "premium-event-ticketing",
   "version": "1.0.0",
   "description": "A fully responsive ticketing experience for a premium event, incorporating high-fashion visual language and advanced features.",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -19,17 +19,22 @@
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
+    "@stripe/stripe-js": "^1.50.0",
+    "axios": "^1.10.0",
+    "firebase-admin": "^13.4.0",
+    "mongodb": "^5.7.0",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "axios": "^0.21.1",
-    "stripe": "^8.0.0",
-    "@stripe/stripe-js": "^1.50.0",
-    "mongodb": "^5.7.0"
+    "stripe": "^18.3.0"
   },
   "devDependencies": {
-    "typescript": "latest",
-    "eslint": "latest",
-    "eslint-config-next": "latest"
+    "@typescript-eslint/eslint-plugin": "^8.36.0",
+    "@typescript-eslint/parser": "^8.36.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "typescript": "latest"
   }
 }
