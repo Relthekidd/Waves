@@ -21,6 +21,7 @@
   "dependencies": {
     "@stripe/stripe-js": "^1.50.0",
     "axios": "^1.10.0",
+    "firebase": "^11.10.0",
     "firebase-admin": "^13.4.0",
     "mongodb": "^5.7.0",
     "next": "latest",
